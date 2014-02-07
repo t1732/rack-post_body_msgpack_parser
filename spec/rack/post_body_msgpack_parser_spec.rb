@@ -51,6 +51,16 @@ describe Rack::PostBodyMsgpackParser do
       end
       last_request.params.should be_empty
     end
+
+    context "when content-type is x-msgpack but body is not msgpack" do
+      it "should deny request" do
+        header 'Content-Type', 'application/x-msgpack'
+        post "/test-it", {}, {:input => json_data} do |response|
+          response.status.should == 400
+          response.body.should == ""
+        end
+      end
+    end
   end
 
   context 'not override_params' do
@@ -93,5 +103,16 @@ describe Rack::PostBodyMsgpackParser do
       end
       last_request.params.should be_empty
     end
+
+    context "when content-type is x-msgpack but body is not msgpack" do
+      it "should deny request" do
+        header 'Content-Type', 'application/x-msgpack'
+        post "/test-it", {}, {:input => json_data} do |response|
+          response.status.should == 400
+          response.body.should == ""
+        end
+      end
+    end
+
   end
 end

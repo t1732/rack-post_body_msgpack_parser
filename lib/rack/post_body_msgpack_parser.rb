@@ -33,6 +33,9 @@ module Rack
         env.update(FORM_HASH_MSGPACK => body)
       end
       @app.call(env)
+    rescue MessagePack::MalformedFormatError => e
+      env['rack.errors'].puts e.inspect
+      [400, {}, []]
     end
   end
 end
