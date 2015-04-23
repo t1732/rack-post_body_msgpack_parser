@@ -15,9 +15,10 @@ module Rack
 
     def call(env)
       @env = env
+      body = post_body
 
-      if MSGPACK_MIME_TYPES.include?(Rack::Request.new(env).media_type) && post_body.length > 0
-        unpacked_body = MessagePack.unpack(post_body)
+      if MSGPACK_MIME_TYPES.include?(Rack::Request.new(env).media_type) && body.length > 0
+        unpacked_body = MessagePack.unpack(body)
         env.update('rack.request.unpacked_form_hash' => unpacked_body)
         if @override_params
           env.update('rack.request.form_hash' => unpacked_body, 'rack.request.form_input' => rack_input)
@@ -32,10 +33,6 @@ module Rack
     private
 
     def post_body
-      @post_body ||= read_input
-    end
-
-    def read_input
       rack_input.read
     ensure
       rack_input.rewind
