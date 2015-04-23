@@ -13,7 +13,7 @@ describe Rack::PostBodyMsgpackParser do
 
         helpers do
           def msgpack_params
-            @_params ||= request.env['rack.request.form_hash_msgpack']
+            @_params ||= request.env['rack.request.unpacked_form_hash']
           end
         end
 
@@ -29,41 +29,41 @@ describe Rack::PostBodyMsgpackParser do
 
     it "should ignore post when posted normally" do
       post "/test-it", {foo: "bar"} do |response|
-        response.body.should == "No Data"
+        expect(response.body).to eq("No Data")
       end
-      last_request.params.should have(1).pair
+      expect(last_request.params.size).to eq(1)
     end
 
     it "should accept post by msgpack data" do
       header 'Content-Type', 'application/x-msgpack'
       post "/test-it", {}, {:input => msgpack_data} do |response|
-        response.body.should include "OK"
-        response.body.should include %q(keys: ["the_key", "sample"])
-        response.body.should include %q(values: ["THE VALUE", [1, 2, 3]])
+        expect(response.body).to include("OK")
+        expect(response.body).to include(%q(keys: ["the_key", "sample"]))
+        expect(response.body).to include(%q(values: ["THE VALUE", [1, 2, 3]]))
       end
-      last_request.params.should be_empty
+      expect(last_request.params).to be_empty
     end
 
     it "should ignore post by json data" do
       header 'Content-Type', 'application/json'
       post "/test-it", {}, {:input => json_data} do |response|
-        response.body.should == "No Data"
+        expect(response.body).to eq("No Data")
       end
-      last_request.params.should be_empty
+      expect(last_request.params).to be_empty
     end
 
     context "when content-type is x-msgpack but body is not msgpack" do
       it "should deny request" do
         header 'Content-Type', 'application/x-msgpack'
         post "/test-it", {}, {:input => json_data} do |response|
-          response.status.should == 400
-          response.body.should == ""
+          expect(response.status).to eq(400)
+          expect(response.body).to eq("")
         end
       end
     end
   end
 
-  context 'not override_params' do
+  context 'override_params' do
     before do
       mock_app do
         use Rack::PostBodyMsgpackParser, override_params: true
@@ -80,36 +80,36 @@ describe Rack::PostBodyMsgpackParser do
 
     it "should ignore post when posted normally" do
       post "/test-it", {foo: "bar"} do |response|
-        response.body.should include %q(foo="bar")
+        expect(response.body).to include(%q(foo="bar"))
       end
-      last_request.params.should have(1).pair
+      expect(last_request.params.size).to eq(1)
     end
 
     it "should accept post by msgpack data" do
       header 'Content-Type', 'application/x-msgpack'
       post "/test-it", {}, {:input => msgpack_data} do |response|
-        response.body.should include %q(the_key="THE VALUE")
-        response.body.should include %q(sample=[1, 2, 3])
+        expect(response.body).to include(%q(the_key="THE VALUE"))
+        expect(response.body).to include(%q(sample=[1, 2, 3]))
       end
-      last_request.params.should have(2).pair
+      expect(last_request.params.size).to eq(2)
     end
 
     it "should ignore post by json data" do
       header 'Content-Type', 'application/json'
       post "/test-it", {}, {:input => json_data} do |response|
-        response.body.length.should == 4
-        response.body.should_not include %q(the_key="THE VALUE")
-        response.body.should_not include %q(sample=[1, 2, 3])
+        expect(response.body.length).to eq(4)
+        expect(response.body).not_to include(%q(the_key="THE VALUE"))
+        expect(response.body).not_to include(%q(sample=[1, 2, 3]))
       end
-      last_request.params.should be_empty
+      expect(last_request.params).to be_empty
     end
 
     context "when content-type is x-msgpack but body is not msgpack" do
       it "should deny request" do
         header 'Content-Type', 'application/x-msgpack'
         post "/test-it", {}, {:input => json_data} do |response|
-          response.status.should == 400
-          response.body.should == ""
+          expect(response.status).to eq(400)
+          expect(response.body).to eq("")
         end
       end
     end

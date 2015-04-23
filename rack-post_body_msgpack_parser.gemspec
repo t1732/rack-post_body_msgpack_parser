@@ -17,12 +17,12 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_runtime_dependency 'rack', '>= 0'
-  gem.add_runtime_dependency 'msgpack', '>= 0'
-  gem.add_development_dependency 'rake', '>= 0'
-  gem.add_development_dependency 'rspec', '>= 0'
-  gem.add_development_dependency 'pry', '>= 0'
-  gem.add_development_dependency 'rack-test', '>= 0'
+  gem.add_runtime_dependency 'rack', '>= 1.6.0'
+  gem.add_runtime_dependency 'msgpack', '>= 0.5.11'
+  gem.add_development_dependency 'rake', '>= 10.4.2'
+  gem.add_development_dependency 'rspec', '>= 3.2.0'
+  gem.add_development_dependency 'pry', '>= 0.10.1'
+  gem.add_development_dependency 'rack-test', '>= 0.6.3'
   gem.add_development_dependency 'sinatra', '>= 1.3.0'
   gem.add_development_dependency 'sinatra-contrib', '>= 0'
 
